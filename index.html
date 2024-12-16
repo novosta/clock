@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clock In/Out</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        input {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 45%;
+            padding: 10px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+        }
+        .clock-in {
+            background-color: #4CAF50;
+        }
+        .clock-out {
+            background-color: #F44336;
+        }
+        .clock-in:hover {
+            background-color: #45A049;
+        }
+        .clock-out:hover {
+            background-color: #E53935;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Employee Clock In/Out</h1>
+        <input type="text" id="employeeId" placeholder="Enter Employee ID" required>
+        <br>
+        <button class="clock-in" onclick="clockIn()">Clock In</button>
+        <button class="clock-out" onclick="clockOut()">Clock Out</button>
+    </div>
+
+    <script>
+        const webhookURL = "YOUR_DISCORD_WEBHOOK_URL"; // Replace with your Discord webhook URL
+
+        function sendToWebhook(action) {
+            const employeeId = document.getElementById('employeeId').value;
+            if (!employeeId) {
+                alert("Please enter an Employee ID.");
+                return;
+            }
+
+            const timestamp = new Date().toISOString();
+            const payload = {
+                content: `Employee **${employeeId}** has **${action}** at **${timestamp}**.`
+            };
+
+            fetch(webhookURL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert(`${action} successfully logged!`);
+                } else {
+                    alert("Failed to log the action. Please check the webhook URL.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("An error occurred. Check the console for details.");
+            });
+        }
+
+        function clockIn() {
+            sendToWebhook("Clocked In");
+        }
+
+        function clockOut() {
+            sendToWebhook("Clocked Out");
+        }
+    </script>
+</body>
+</html>
