@@ -1,104 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clock In/Out</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        .container {
-            max-width: 400px;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        input {
-            width: 90%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            width: 45%;
-            padding: 10px;
-            margin: 5px;
-            border: none;
-            border-radius: 5px;
-            color: #fff;
-            cursor: pointer;
-        }
-        .clock-in {
-            background-color: #4CAF50;
-        }
-        .clock-out {
-            background-color: #F44336;
-        }
-        .clock-in:hover {
-            background-color: #45A049;
-        }
-        .clock-out:hover {
-            background-color: #E53935;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mines Game Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    #admin-panel {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 20px;
+      background: white;
+      border: 1px solid #ccc;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+    #overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+    #game-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 50px);
+      gap: 5px;
+      margin: 20px auto;
+      justify-content: center;
+    }
+    .cell {
+      width: 50px;
+      height: 50px;
+      background-color: #e5e7eb;
+      border: 1px solid #d1d5db;
+      text-align: center;
+      line-height: 50px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .cell.safe {
+      background-color: #34d399;
+    }
+    .cell.mine {
+      background-color: #ef4444;
+      color: white;
+    }
+    .hidden { display: none; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Employee Clock In/Out</h1>
-        <input type="text" id="employeeId" placeholder="Enter Employee ID" required>
-        <br>
-        <button class="clock-in" onclick="clockIn()">Clock In</button>
-        <button class="clock-out" onclick="clockOut()">Clock Out</button>
+  <h1>Game Page</h1>
+  <p>Welcome to the Mines Game Demo. Press <strong>Ctrl + A</strong> to open the admin panel.</p>
+
+  <!-- Game Section -->
+  <div id="game">
+    <h2>Play Mines</h2>
+    <p>Balance: $<span id="player-balance">0</span></p>
+    <p id="game-status">Click cells to reveal safe spots!</p>
+    <div id="game-grid">
+      <!-- Grid cells will be dynamically generated -->
     </div>
+    <button id="reset-game">Reset Game</button>
+  </div>
 
-    <script>
-        const webhookURL = "https://discordapp.com/api/webhooks/1318031101259812994/DGdALUTt6kFYamw1neK_LhJRM4DrLWqjcmjR1LEHbV2oFMP8eROYRWEKdbEgI0CddLWz"; // Replace with your Discord webhook URL
+  <!-- Hidden Overlay -->
+  <div id="overlay"></div>
 
-        function sendToWebhook(action) {
-            const employeeId = document.getElementById('employeeId').value;
-            if (!employeeId) {
-                alert("Please enter an Employee ID.");
-                return;
-            }
+  <!-- Admin Panel -->
+  <div id="admin-panel">
+    <h2>Admin Panel</h2>
+    <label for="password">Enter Password:</label>
+    <input type="password" id="password" placeholder="Enter Password">
+    <button onclick="unlockAdminPanel()">Unlock</button>
 
-            const timestamp = new Date().toISOString();
-            const payload = {
-                content: `Employee **${employeeId}** has **${action}** at **${timestamp}**.`
-            };
+    <div id="admin-content" class="hidden">
+      <h3>Manage Session Balance</h3>
+      <label for="player-id">Player ID:</label>
+      <input type="text" id="player-id" placeholder="Enter Player ID">
+      <label for="balance">Set Balance:</label>
+      <input type="number" id="balance" placeholder="Enter New Balance">
+      <button onclick="updatePlayerBalance()">Set Session Balance</button>
 
-            fetch(webhookURL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payload)
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert(`${action} successfully logged!`);
-                } else {
-                    alert("Failed to log the action. Please check the webhook URL.");
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert("An error occurred. Check the console for details.");
-            });
-        }
+      <h3>Current Session Balances</h3>
+      <div id="session-balances"></div>
+    </div>
+  </div>
 
-        function clockIn() {
-            sendToWebhook("Clocked In");
-        }
-
-        function clockOut() {
-            sendToWebhook("Clocked Out");
-        }
-    </script>
+  <script src="demo.js"></script>
 </body>
 </html>
